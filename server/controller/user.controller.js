@@ -8,8 +8,8 @@ import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, s
 
 export const signup = async (req, res) => {
   try {
-    const { fullname, email, password, contact } = req.body;
-
+    const { input, hasRestaurant } = req.body;
+    const { fullname, email, password, contact } = input;
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
@@ -23,6 +23,7 @@ export const signup = async (req, res) => {
     user = await User.create({
       fullname,
       email,
+      admin:hasRestaurant,
       password: hashedPassword,
       contact: Number(contact),
       verificationToken,

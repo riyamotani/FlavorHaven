@@ -24,7 +24,7 @@ type UserState = {
     isAuthenticated: boolean;
     isCheckingAuth: boolean;
     loading: boolean;
-    signup: (input:SignupInputState) => Promise<void>;
+    signup: (input:SignupInputState, hasRestaurant:boolean) => Promise<void>;
     login: (input:LoginInputState) => Promise<void>;
     verifyEmail: (verificationCode: string) => Promise<void>;
     checkAuthentication: () => Promise<void>;
@@ -39,10 +39,10 @@ export const useUserStore = create<UserState>()(persist((set) => ({
     isAuthenticated: false,
     isCheckingAuth: true,
     loading: false,
-    signup: async (input: SignupInputState) => {
+    signup: async (input: SignupInputState, hasRestaurant: boolean) => {
         try {
             set({ loading: true });
-            const response = await axios.post(`${API_END_POINT}/signup`, input, {
+            const response = await axios.post(`${API_END_POINT}/signup`, {input, hasRestaurant}, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

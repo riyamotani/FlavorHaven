@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { SignupInputState, userSignupSchema } from "@/schema/userSchema";
 import { useUserStore } from "@/store/useUserStore";
 import { Loader2, LockKeyhole, Mail, PhoneCall, User } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-// interface SignupInputState { 
+// interface SignupInputState {
 //   fullname: string
 //   email: string;
 //   password: string;
@@ -19,29 +20,34 @@ export const Signup = () => {
     fullname: "",
     email: "",
     password: "",
-    contact:""
+    contact: "",
   });
-  const [errors, setErrors] = useState<Partial<SignupInputState>>({})
-  const {signup, loading} = useUserStore();
+  const [errors, setErrors] = useState<Partial<SignupInputState>>({});
+  const { signup, loading } = useUserStore();
+  const [hasRestaurant, setHasRestaurant] = useState(false);
   const navigate = useNavigate();
 
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
-    console.log(loading, "loading")
+    console.log(loading, "loading");
+  };
+
+  const toggleRestaurantHandler = async() => {
+    setHasRestaurant(!hasRestaurant);
   };
 
   const loginSubmitHandler = async (e: FormEvent) => {
     e.preventDefault();
     // validation
     const result = userSignupSchema.safeParse(input);
-    if(!result.success){
-        const fieldErrors = result.error.formErrors.fieldErrors;
-        setErrors(fieldErrors as Partial<SignupInputState>);
-        return;
+    if (!result.success) {
+      const fieldErrors = result.error.formErrors.fieldErrors;
+      setErrors(fieldErrors as Partial<SignupInputState>);
+      return;
     }
     try {
-      await signup(input);
+      await signup(input, hasRestaurant);
       navigate("/verify-email");
     } catch (error) {
       console.log(error);
@@ -57,6 +63,18 @@ export const Signup = () => {
         <div className="mb-4">
           <h1 className="font-bold text-2xl">FlavorHaven</h1>
         </div>
+        <div className="mb-4 flex items-center">
+          <div className="relative">
+            <Switch
+              id="restaurant-toggle"
+              checked={hasRestaurant}
+              onCheckedChange={toggleRestaurantHandler}
+            />
+            <label htmlFor="restaurant-toggle" className="ml-2 text-sm">
+              Do you have a restaurant?
+            </label>
+          </div>
+        </div>
         <div className="mb-4">
           <div className="relative">
             <Input
@@ -68,9 +86,9 @@ export const Signup = () => {
               className="pl-10 focus-visible:ring-0"
             />
             <User className="absolute inset-y-2 left-2 text-gray-500 pointer-events-none" />
-            {
-                errors && <span className="text-xs text-red-500">{errors.fullname}</span>
-            }
+            {errors && (
+              <span className="text-xs text-red-500">{errors.fullname}</span>
+            )}
           </div>
         </div>
         <div className="mb-4">
@@ -84,9 +102,9 @@ export const Signup = () => {
               className="pl-10 focus-visible:ring-0"
             />
             <Mail className="absolute inset-y-2 left-2 text-gray-500 pointer-events-none" />
-            {
-                errors && <span className="text-xs text-red-500">{errors.email}</span>
-            }
+            {errors && (
+              <span className="text-xs text-red-500">{errors.email}</span>
+            )}
           </div>
         </div>
         <div className="mb-4">
@@ -100,9 +118,9 @@ export const Signup = () => {
               className="pl-10 focus-visible:ring-0"
             />
             <LockKeyhole className="absolute inset-y-2 left-2 text-gray-500 pointer-events-none" />
-            {
-                errors && <span className="text-xs text-red-500">{errors.password}</span>
-            }
+            {errors && (
+              <span className="text-xs text-red-500">{errors.password}</span>
+            )}
           </div>
         </div>
         <div className="mb-4">
@@ -116,9 +134,9 @@ export const Signup = () => {
               className="pl-10 focus-visible:ring-0"
             />
             <PhoneCall className="absolute inset-y-2 left-2 text-gray-500 pointer-events-none" />
-            {
-                errors && <span className="text-xs text-red-500">{errors.contact}</span>
-            }
+            {errors && (
+              <span className="text-xs text-red-500">{errors.contact}</span>
+            )}
           </div>
         </div>
         <div className="mb-10">
@@ -128,7 +146,10 @@ export const Signup = () => {
               Please wait
             </Button>
           ) : (
-            <Button type="submit" className="w-full bg-orange hover:bg-hoverOrange">
+            <Button
+              type="submit"
+              className="w-full bg-orange hover:bg-hoverOrange"
+            >
               Signup
             </Button>
           )}

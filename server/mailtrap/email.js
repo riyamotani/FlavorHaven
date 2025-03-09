@@ -1,15 +1,22 @@
 import { generatePasswordResetEmailHtml, generateResetSuccessEmailHtml, generateWelcomeEmailHtml, htmlContent } from "./htmlEmail.js";
-import { client, sender } from "./mailtrap.js";
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'riyamotani601@gmail.com',
+        pass: process.env.NODEMAILER
+    }
+});
 
 export const sendVerificationEmail = async (email, verificationToken) => {
-    const recipient = [{ email }];
+    const recipient =  email ;
     try {
-        const res = await client.send({
-            from: sender,
+        transporter.sendMail({
+            from: 'riyamotani601@gmail.com',
             to: recipient,
             subject: 'Verify your email',
             html:htmlContent.replace("{verificationToken}", verificationToken),
-            category: 'Email Verification'
         });
     } catch (error) {
         console.log(error);
@@ -21,15 +28,11 @@ export const sendWelcomeEmail = async (email, name) => {
     const recipient = [{ email }];
     const htmlContent = generateWelcomeEmailHtml(name);
     try {
-        const res = await client.send({
-            from: sender,
+        transporter.sendMail({
+            from: 'riyamotani601@gmail.com',
             to: recipient,
             subject: 'Welcome to FlavorHaven',
             html:htmlContent,
-            template_variables:{
-                company_info_name:"FlavorHaven",
-                name:name
-            }
         });
     } catch (error) {
         console.log(error);
@@ -40,12 +43,11 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
     const recipient = [{ email }];
     const htmlContent = generatePasswordResetEmailHtml(resetURL);
     try {
-        const res = await client.send({
-            from: sender,
+        transporter.sendMail({
+            from: 'riyamotani601@gmail.com',
             to: recipient,
             subject: 'Reset your password',
-            html:htmlContent,
-            category:"Reset Password"
+            html:htmlContent
         });
     } catch (error) {
         console.log(error);
@@ -56,12 +58,11 @@ export const sendResetSuccessEmail = async (email) => {
     const recipient = [{ email }];
     const htmlContent = generateResetSuccessEmailHtml();
     try {
-        const res = await client.send({
-            from: sender,
+        transporter.sendMail({
+            from: 'riyamotani601@gmail.com',
             to: recipient,
             subject: 'Password Reset Successfully',
-            html:htmlContent,
-            category:"Password Reset"
+            html:htmlContent
         });
     } catch (error) {
         console.log(error);
